@@ -1,0 +1,47 @@
+{
+    "name": "telescopeai/autodebug",
+    "description": "AI-powered auto-debug & auto-fix system for Laravel. Monitors Telescope exceptions, analyzes them with AI, generates fixes, and creates GitHub PRs automatically.",
+    "keywords": ["laravel", "telescope", "debugging", "ai", "auto-fix", "github", "openai", "claude"],
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "TelescopeAI",
+            "email": "dev@telescopeai.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/console": "^10.0|^11.0|^12.0",
+        "illuminate/database": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0",
+        "illuminate/routing": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TelescopeAI\\AutoDebug\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TelescopeAI\\AutoDebug\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TelescopeAI\\AutoDebug\\AutoDebugServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
