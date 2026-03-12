@@ -1,7 +1,24 @@
 {
     "name": "telescopeai/autodebug",
     "description": "AI-powered auto-debug & auto-fix system for Laravel. Monitors Telescope exceptions, analyzes them with AI, generates fixes, and creates GitHub PRs automatically.",
-    "keywords": ["laravel", "telescope", "debugging", "ai", "auto-fix", "github", "openai", "claude"],
+    "keywords": [
+        "laravel",
+        "telescope",
+        "debugging",
+        "ai",
+        "auto-fix",
+        "github",
+        "openai",
+        "claude",
+        "gemini",
+        "ollama",
+        "automation"
+    ],
+    "homepage": "https://github.com/avinash-borse/telescope_autodebug",
+    "support": {
+        "issues": "https://github.com/avinash-borse/telescope_autodebug/issues",
+        "source": "https://github.com/avinash-borse/telescope_autodebug"
+    },
     "license": "MIT",
     "type": "library",
     "authors": [
