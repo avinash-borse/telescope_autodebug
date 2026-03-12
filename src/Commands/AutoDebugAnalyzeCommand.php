@@ -17,6 +17,7 @@ class AutoDebugAnalyzeCommand extends Command
                             {--dry-run : Analyze without creating PRs}
                             {--batch= : Number of exceptions to process}
                             {--force : Bypass rate limiting}
+                            {--diff : Show file diffs in the terminal}
                             {--uuid= : Analyze a specific Telescope entry UUID}';
 
     protected $description = 'Analyze Telescope exceptions with AI and generate auto-fix PRs';
@@ -122,7 +123,7 @@ class AutoDebugAnalyzeCommand extends Command
                     $this->info('   🔧 Validating patches...');
                     $validation = $this->fixGenerator->validatePatches($result['file_patches']);
 
-                    $this->renderValidation($validation);
+                    $this->renderValidation($validation, $this->option('diff'));
 
                     // Step 6: Create PR if conditions are met
                     if (
@@ -235,12 +236,27 @@ class AutoDebugAnalyzeCommand extends Command
     /**
      * Render patch validation results to console.
      */
-    protected function renderValidation(array $validation): void
+    protected function renderValidation(array $validation, bool $showDiff = false): void
     {
         if (!empty($validation['applied'])) {
             $this->info('      ✅ Valid patches:');
             foreach ($validation['applied'] as $patch) {
                 $this->comment("         • {$patch['file']}: {$patch['description']}");
+
+                if ($showDiff) {
+                    $this->newLine();
+                    $diff = $this->fixGenerator->generateDiff($patch['file'], $patch['search'], $patch['replace']);
+                    foreach (explode("\n", $diff) as $line) {
+                        if (str_starts_with($line, '+')) {
+                            $this->line("            <fg=green>{$line}</>");
+                        } elseif (str_starts_with($line, '-')) {
+                            $this->line("            <fg=red>{$line}</>");
+                        } else {
+                            $this->line("            {$line}");
+                        }
+                    }
+                    $this->newLine();
+                }
             }
         }
 

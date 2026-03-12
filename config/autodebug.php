@@ -19,7 +19,7 @@ return [
     | AI Provider Configuration
     |--------------------------------------------------------------------------
     |
-    | Supported providers: 'openai', 'anthropic'
+    | Supported providers: 'openai', 'anthropic', 'google', 'ollama'
     | The system will use the configured provider for exception analysis
     | and fix generation.
     |
@@ -36,7 +36,19 @@ return [
 
         'anthropic' => [
             'api_key' => env('AUTODEBUG_ANTHROPIC_API_KEY', env('ANTHROPIC_API_KEY')),
-            'model'   => env('AUTODEBUG_ANTHROPIC_MODEL', 'claude-sonnet-4-20250514'),
+            'model'   => env('AUTODEBUG_ANTHROPIC_MODEL', 'claude-3-5-sonnet-latest'),
+            'max_tokens' => 4096,
+        ],
+
+        'google' => [
+            'api_key' => env('AUTODEBUG_GOOGLE_API_KEY', env('GOOGLE_API_KEY')),
+            'model'   => env('AUTODEBUG_GOOGLE_MODEL', 'gemini-2.0-flash'),
+            'max_tokens' => 4096,
+        ],
+
+        'ollama' => [
+            'base_url' => env('AUTODEBUG_OLLAMA_BASE_URL', 'http://localhost:11434'),
+            'model'    => env('AUTODEBUG_OLLAMA_MODEL', 'deepseek-coder'),
             'max_tokens' => 4096,
         ],
     ],

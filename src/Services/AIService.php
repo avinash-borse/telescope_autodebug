@@ -34,6 +34,8 @@ class AIService
         $response = match ($this->provider) {
             'openai'    => $this->callOpenAI($prompt),
             'anthropic' => $this->callAnthropic($prompt),
+            'google'    => $this->callGoogle($prompt),
+            'ollama'    => $this->callOllama($prompt),
             default     => throw new \InvalidArgumentException("Unsupported AI provider: {$this->provider}"),
         };
 
@@ -139,7 +141,9 @@ PROMPT;
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->config['api_key'],
             'Content-Type'  => 'application/json',
-        ])->timeout(60)->post('https://api.openai.com/v1/chat/completions', [
+        ])->timeout(60)->withOptions([
+            'verify' => false,
+        ])->post('https://api.openai.com/v1/chat/completions', [
             'model'       => $this->config['model'],
             'max_tokens'  => $this->config['max_tokens'] ?? 4096,
             'temperature' => 0.2,
@@ -172,7 +176,9 @@ PROMPT;
             'x-api-key'         => $this->config['api_key'],
             'anthropic-version' => '2023-06-01',
             'Content-Type'      => 'application/json',
-        ])->timeout(60)->post('https://api.anthropic.com/v1/messages', [
+        ])->timeout(60)->withOptions([
+            'verify' => false,
+        ])->post('https://api.anthropic.com/v1/messages', [
             'model'      => $this->config['model'],
             'max_tokens' => $this->config['max_tokens'] ?? 4096,
             'messages'   => [
@@ -190,6 +196,62 @@ PROMPT;
         }
 
         return $response->json('content.0.text', '');
+    }
+
+    /**
+     * Call the Google Gemini API.
+     */
+    protected function callGoogle(string $prompt): string
+    {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->timeout(60)->withOptions([
+            'verify' => false,
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->config['model']}:generateContent?key={$this->config['api_key']}", [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => "System instruction: You are an expert Laravel PHP debugging assistant. Always respond with valid JSON only, no markdown formatting around it.\n\n" . $prompt],
+                    ],
+                ],
+            ],
+            'generationConfig' => [
+                'temperature' => 0.2,
+                'maxOutputTokens' => $this->config['max_tokens'] ?? 4096,
+            ],
+        ]);
+
+        if ($response->failed()) {
+            $error = $response->json('error.message', 'Unknown Google API error');
+            throw new \RuntimeException("Google API error: {$error}");
+        }
+
+        return $response->json('candidates.0.content.parts.0.text', '');
+    }
+
+    /**
+     * Call the local Ollama API.
+     */
+    protected function callOllama(string $prompt): string
+    {
+        $response = Http::timeout(120)->withOptions([
+            'verify' => false,
+        ])->post("{$this->config['base_url']}/api/generate", [
+            'model'  => $this->config['model'],
+            'prompt' => "System: You are an expert Laravel PHP debugging assistant. Always respond with valid JSON only, no markdown formatting around it.\n\n" . $prompt,
+            'stream' => false,
+            'options' => [
+                'temperature' => 0.2,
+                'num_predict' => $this->config['max_tokens'] ?? 4096,
+            ],
+        ]);
+
+        if ($response->failed()) {
+            $error = $response->json('error', $response->reason() ?: 'Unknown Ollama error');
+            throw new \RuntimeException("Ollama API error: {$error}");
+        }
+
+        return $response->json('response', '');
     }
 
     /**

@@ -16,10 +16,10 @@ class GitHubPRService
 
     public function __construct()
     {
-        $this->token      = config('autodebug.github.token', '');
-        $this->owner      = config('autodebug.github.owner', '');
-        $this->repo       = config('autodebug.github.repo', '');
-        $this->baseBranch = config('autodebug.github.base_branch', 'main');
+        $this->token      = config('autodebug.github.token') ?? '';
+        $this->owner      = config('autodebug.github.owner') ?? '';
+        $this->repo       = config('autodebug.github.repo') ?? '';
+        $this->baseBranch = config('autodebug.github.base_branch') ?? 'main';
     }
 
     /**

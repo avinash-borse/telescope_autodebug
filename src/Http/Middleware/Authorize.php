@@ -29,7 +29,7 @@ class Authorize
     protected function allowedToAccess(Request $request): bool
     {
         // In local/development, always allow
-        if (app()->environment('local', 'development', 'testing')) {
+        if (app()->environment('local', 'development', 'testing', 'dev')) {
             return true;
         }
 
